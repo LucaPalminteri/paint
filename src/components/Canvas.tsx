@@ -1,86 +1,47 @@
-"use client";
 import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Brush,
-  Eraser,
-  Circle,
-  Square,
-  Triangle,
-  ArrowRight,
-  MousePointer,
-  Copy,
-  Scissors,
-  Move,
-  Clipboard,
-  Grid,
-  MoveRight,
-} from "lucide-react";
-import { Separator } from "./ui/separator";
-import MenuComponent from "./MenuComponent";
+import { Grid } from "lucide-react";
+import { DrawingMode } from "@/types/DrawingMode";
 
-const BRUSH_SIZES = [2, 5, 10, 20, 30];
-const COLOR_PALETTE = [
-  "#000000",
-  "#FFFFFF",
-  "#FF0000",
-  "#00FF00",
-  "#0000FF",
-  "#FFFF00",
-  "#00FFFF",
-  "#FF00FF",
-  "#C0C0C0",
-  "#808080",
-  "#800000",
-  "#808000",
-  "#008000",
-  "#800080",
-  "#008080",
-  "#000080",
-];
+interface CanvasProps {
+  canvasRef: React.RefObject<HTMLCanvasElement>;
+  tempCanvasRef: React.RefObject<HTMLCanvasElement>;
+  gridCanvasRef: React.RefObject<HTMLCanvasElement>;
+  primaryColor: string;
+  secondaryColor: string;
+  brushSize: number;
+  drawingMode: DrawingMode;
+  showGrid: boolean;
+  selection: { x: number; y: number; width: number; height: number } | null;
+  setSelection: (
+    selection: { x: number; y: number; width: number; height: number } | null,
+  ) => void;
+  clipboard: ImageData | null;
+  setClipboard: (data: ImageData | null) => void;
+}
 
-type DrawingMode =
-  | "brush"
-  | "eraser"
-  | "circle"
-  | "square"
-  | "triangle"
-  | "arrow"
-  | "select"
-  | "move";
-
-export default function WebPaint() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const tempCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const gridCanvasRef = useRef<HTMLCanvasElement | null>(null);
+export default function Canvas({
+  canvasRef,
+  tempCanvasRef,
+  gridCanvasRef,
+  primaryColor,
+  secondaryColor,
+  brushSize,
+  drawingMode,
+  showGrid,
+  selection,
+  setSelection,
+  clipboard,
+  setClipboard,
+}: CanvasProps) {
   const [isDrawing, setIsDrawing] = useState(false);
-  const [primaryColor, setPrimaryColor] = useState("#000000");
-  const [secondaryColor, setSecondaryColor] = useState("#FFFFFF");
-  const [brushSize, setBrushSize] = useState(5);
-  const [drawingMode, setDrawingMode] = useState<DrawingMode>("brush");
   const [shapeStart, setShapeStart] = useState<{ x: number; y: number } | null>(
     null,
   );
-  const [selection, setSelection] = useState<{
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  } | null>(null);
   const [isMoving, setIsMoving] = useState(false);
   const [moveStart, setMoveStart] = useState<{ x: number; y: number } | null>(
     null,
   );
-  const [clipboard, setClipboard] = useState<ImageData | null>(null);
-  const [showGrid, setShowGrid] = useState(false);
-  const [backgroundColor, setBackgroundColor] = useState("#FFFFFF");
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -111,30 +72,8 @@ export default function WebPaint() {
     drawGrid();
   }, [showGrid]);
 
-  useEffect(() => {
-    document.body.style.backgroundColor = backgroundColor;
-  }, [backgroundColor]);
-
-  const handleResize = () => {
-    const canvas = canvasRef.current;
-    const tempCanvas = tempCanvasRef.current;
-    const gridCanvas = gridCanvasRef.current;
-    if (canvas && tempCanvas && gridCanvas) {
-      const imageData = canvas
-        .getContext("2d")
-        ?.getImageData(0, 0, canvas.width, canvas.height);
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight - 60;
-      tempCanvas.width = canvas.width;
-      tempCanvas.height = canvas.height;
-      gridCanvas.width = canvas.width;
-      gridCanvas.height = canvas.height;
-      canvas.getContext("2d")?.putImageData(imageData!, 0, 0);
-      drawGrid();
-    }
-  };
-
-  const drawGrid = () => {
+  // ... (implement the canvas drawing logic)
+  // const drawGrid = () => {
     const gridCanvas = gridCanvasRef.current;
     const context = gridCanvas?.getContext("2d");
     if (context && gridCanvas) {
@@ -303,7 +242,7 @@ export default function WebPaint() {
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
     if (context) {
-      context.fillStyle = backgroundColor;
+      context.fillStyle = "#FFFFFF";
       context.fillRect(0, 0, canvas!.width, canvas!.height);
     }
     setSelection(null);
@@ -333,9 +272,9 @@ export default function WebPaint() {
     );
   };
 
-  const handleBackgroundColorChange = (color: string) => {
-    setBackgroundColor(color);
-  };
+  // const handleBackgroundColorChange = (color: string) => {
+  //   setBackgroundColor(color);
+  // };
 
   const drawSelection = () => {
     const canvas = canvasRef.current;
@@ -432,204 +371,25 @@ export default function WebPaint() {
   };
 
   return (
-    <div className="h-screen flex flex-col select-none">
-      <div className="bg-gray-100 p-2 flex justify-center items-center space-x-4 overflow-x-auto flex-wrap">
-        <div className="flex items-center space-x-4">
-          <Button
-            variant={drawingMode === "select" ? "secondary" : "outline"}
-            onClick={() => setDrawingMode("select")}
-          >
-            <MousePointer className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={drawingMode === "move" ? "secondary" : "outline"}
-            onClick={() => setDrawingMode("move")}
-          >
-            <Move className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={drawingMode === "brush" ? "secondary" : "outline"}
-            onClick={() => setDrawingMode("brush")}
-          >
-            <Brush className="w-4 h-4 " />
-          </Button>
-          <Button
-            variant={drawingMode === "eraser" ? "secondary" : "outline"}
-            onClick={() => setDrawingMode("eraser")}
-          >
-            <Eraser className="w-4 h-4" />
-          </Button>
-          <Separator orientation="vertical" className="h-12" />
-
-          <div className="flex items-center space-x-2">
-            <Select onValueChange={(value) => setBrushSize(Number(value))}>
-              <SelectTrigger className="w-[100px]">
-                <SelectValue
-                  placeholder={
-                    <div className="flex justify-start items-center gap-2">
-                      <div
-                        style={{
-                          height: `${2}px`,
-                          width: "30px",
-                          backgroundColor: "black",
-                        }}
-                      ></div>
-                      <span>{2}px</span>
-                    </div>
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {BRUSH_SIZES.map((size) => (
-                  <SelectItem key={size} value={size.toString()}>
-                    <div className="flex justify-start items-center gap-2">
-                      <div
-                        style={{
-                          height: `${size}px`,
-                          width: "30px",
-                          backgroundColor: "black",
-                        }}
-                      ></div>
-                      <span>{size}px</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Separator orientation="vertical" className="h-12" />
-
-          <div className="flex flex-col">
-            <input
-              type="color"
-              value={primaryColor}
-              onChange={(e) => setPrimaryColor(e.target.value)}
-              className="w-6 h-6"
-            />
-            <input
-              type="color"
-              value={secondaryColor}
-              onChange={(e) => setSecondaryColor(e.target.value)}
-              className="w-6 h-6"
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex space-x-1 gap-1">
-              {COLOR_PALETTE.slice(0, Math.ceil(COLOR_PALETTE.length / 2)).map(
-                (paletteColor) => (
-                  <button
-                    key={paletteColor}
-                    className={`w-5 h-5 rounded-full ${
-                      primaryColor === paletteColor
-                        ? "ring-1 ring-offset-1 ring-blue-500"
-                        : ""
-                    }`}
-                    style={{ backgroundColor: paletteColor }}
-                    onClick={() => setPrimaryColor(paletteColor)}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      setSecondaryColor(paletteColor);
-                    }}
-                  />
-                ),
-              )}
-            </div>
-            <div className="flex space-x-1 gap-1">
-              {COLOR_PALETTE.slice(Math.ceil(COLOR_PALETTE.length / 2)).map(
-                (paletteColor) => (
-                  <button
-                    key={paletteColor}
-                    className={`w-5 h-5 rounded-full ${
-                      primaryColor === paletteColor
-                        ? "ring-1 ring-offset-1 ring-blue-500"
-                        : ""
-                    }`}
-                    style={{ backgroundColor: paletteColor }}
-                    onClick={() => setPrimaryColor(paletteColor)}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      setSecondaryColor(paletteColor);
-                    }}
-                  />
-                ),
-              )}
-            </div>
-          </div>
-          <Separator orientation="vertical" className="h-12" />
-
-          <Button
-            variant={drawingMode === "circle" ? "secondary" : "outline"}
-            onClick={() => setDrawingMode("circle")}
-            className="p-2"
-          >
-            <Circle className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={drawingMode === "square" ? "secondary" : "outline"}
-            onClick={() => setDrawingMode("square")}
-            className="p-2"
-          >
-            <Square className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={drawingMode === "triangle" ? "secondary" : "outline"}
-            onClick={() => setDrawingMode("triangle")}
-            className="p-2"
-          >
-            <Triangle className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={drawingMode === "arrow" ? "secondary" : "outline"}
-            onClick={() => setDrawingMode("arrow")}
-            className="p-2"
-          >
-            <MoveRight className="w-4 h-4" />
-          </Button>
-
-          <Separator orientation="vertical" className="h-12" />
-
-          <Button onClick={copySelection} disabled={!selection}>
-            <Copy className="w-4 h-4" />
-          </Button>
-          <Button onClick={cutSelection} disabled={!selection}>
-            <Scissors className="w-4 h-4" />
-          </Button>
-          <Button onClick={pasteSelection} disabled={!clipboard || !selection}>
-            <Clipboard className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-      <div className="relative flex-grow">
-        <div className="absolute bottom-2 left z-10 p-2">
-          <MenuComponent
-            clearCanvas={clearCanvas}
-            saveCanvas={saveCanvas}
-            setCanvasBackground={handleBackgroundColorChange}
-          />
-        </div>
-        <div
-          className="absolute bottom-2 right-2 z-10 p-2"
-          style={{ backgroundColor }}
+    <div className="relative flex-grow">
+      <div className="absolute bottom-2 right-2 z-10 p-2">
+        <Button
+          variant={showGrid ? "secondary" : "outline"}
+          onClick={() => setShowGrid(!showGrid)}
+          className="p-2"
         >
-          <Button
-            variant="outline"
-            onClick={() => setShowGrid(!showGrid)}
-            className=" p-2 m-0"
-          >
-            <Grid className="w-4 h-4" />
-          </Button>
-        </div>
-        <canvas
-          ref={canvasRef}
-          onMouseDown={startDrawing}
-          onMouseMove={draw}
-          onMouseUp={stopDrawing}
-          onMouseOut={stopDrawing}
-          onContextMenu={(e) => e.preventDefault()}
-          className="absolute top-0 left-0 cursor-crosshair"
-        />
+          <Grid className="w-4 h-4" />
+        </Button>
       </div>
+      <canvas
+        ref={canvasRef}
+        onMouseDown={startDrawing}
+        onMouseMove={draw}
+        onMouseUp={stopDrawing}
+        onMouseOut={stopDrawing}
+        onContextMenu={(e) => e.preventDefault()}
+        className="absolute top-0 left-0 cursor-crosshair"
+      />
     </div>
   );
 }
