@@ -14,7 +14,6 @@ import {
   Circle,
   Square,
   Triangle,
-  ArrowRight,
   MousePointer,
   Copy,
   Scissors,
@@ -25,25 +24,37 @@ import {
 } from "lucide-react";
 import { Separator } from "./ui/separator";
 import MenuComponent from "./MenuComponent";
+import { motion } from "framer-motion";
 
 const BRUSH_SIZES = [2, 5, 10, 20, 30];
+// const COLOR_PALETTE = [
+//   "#000000",
+//   "#FFFFFF",
+//   "#FF0000",
+//   "#00FF00",
+//   "#0000FF",
+//   "#FFFF00",
+//   "#00FFFF",
+//   "#FF00FF",
+//   "#C0C0C0",
+//   "#808080",
+//   "#800000",
+//   "#808000",
+//   "#008000",
+//   "#800080",
+//   "#008080",
+//   "#000080",
+// ];
+
 const COLOR_PALETTE = [
-  "#000000",
-  "#FFFFFF",
-  "#FF0000",
-  "#00FF00",
-  "#0000FF",
-  "#FFFF00",
-  "#00FFFF",
-  "#FF00FF",
-  "#C0C0C0",
-  "#808080",
-  "#800000",
-  "#808000",
-  "#008000",
-  "#800080",
-  "#008080",
-  "#000080",
+  "#000000", // Black
+  "#FFFFFF", // White
+  "#FF0000", // Red
+  "#00FF00", // Green
+  "#0000FF", // Blue
+  "#FFFF00", // Yellow
+  "#00FFFF", // Cyan
+  "#FF00FF", // Magenta
 ];
 
 type DrawingMode =
@@ -55,6 +66,19 @@ type DrawingMode =
   | "arrow"
   | "select"
   | "move";
+
+const ToolButton = ({ isActive, onClick, children }) => (
+  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+    <Button
+      variant={isActive ? "secondary" : "ghost"}
+      onClick={onClick}
+      size="icon"
+      className="w-8 h-8 transition-all duration-200 ease-in-out hover:bg-gray-200"
+    >
+      {children}
+    </Button>
+  </motion.div>
+);
 
 export default function WebPaint() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -81,6 +105,11 @@ export default function WebPaint() {
   const [clipboard, setClipboard] = useState<ImageData | null>(null);
   const [showGrid, setShowGrid] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState("#FFFFFF");
+  const [isVisible, setIsVisible] = useState(false);
+
+  React.useEffect(() => {
+    setIsVisible(true);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -433,173 +462,170 @@ export default function WebPaint() {
 
   return (
     <div className="h-screen flex flex-col select-none">
-      <div className="bg-gray-100 p-2 flex justify-center items-center space-x-4 overflow-x-auto flex-wrap">
-        <div className="flex items-center space-x-4">
-          <Button
-            variant={drawingMode === "select" ? "secondary" : "outline"}
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : -50 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="bg-white shadow-md p-2 flex justify-center items-center space-x-2 overflow-x-auto"
+      >
+        <div className="flex items-center space-x-1 bg-gray-100 rounded-md p-1">
+          <ToolButton
+            isActive={drawingMode === "select"}
             onClick={() => setDrawingMode("select")}
           >
             <MousePointer className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={drawingMode === "move" ? "secondary" : "outline"}
+          </ToolButton>
+          <ToolButton
+            isActive={drawingMode === "move"}
             onClick={() => setDrawingMode("move")}
           >
             <Move className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={drawingMode === "brush" ? "secondary" : "outline"}
+          </ToolButton>
+          <ToolButton
+            isActive={drawingMode === "brush"}
             onClick={() => setDrawingMode("brush")}
           >
-            <Brush className="w-4 h-4 " />
-          </Button>
-          <Button
-            variant={drawingMode === "eraser" ? "secondary" : "outline"}
+            <Brush className="w-4 h-4" />
+          </ToolButton>
+          <ToolButton
+            isActive={drawingMode === "eraser"}
             onClick={() => setDrawingMode("eraser")}
           >
             <Eraser className="w-4 h-4" />
-          </Button>
-          <Separator orientation="vertical" className="h-12" />
+          </ToolButton>
+        </div>
 
-          <div className="flex items-center space-x-2">
-            <Select onValueChange={(value) => setBrushSize(Number(value))}>
-              <SelectTrigger className="w-[100px]">
-                <SelectValue
-                  placeholder={
-                    <div className="flex justify-start items-center gap-2">
-                      <div
-                        style={{
-                          height: `${2}px`,
-                          width: "30px",
-                          backgroundColor: "black",
-                        }}
-                      ></div>
-                      <span>{2}px</span>
-                    </div>
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {BRUSH_SIZES.map((size) => (
-                  <SelectItem key={size} value={size.toString()}>
-                    <div className="flex justify-start items-center gap-2">
-                      <div
-                        style={{
-                          height: `${size}px`,
-                          width: "30px",
-                          backgroundColor: "black",
-                        }}
-                      ></div>
-                      <span>{size}px</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <Separator orientation="vertical" className="h-8" />
+
+        <div className="flex items-center space-x-1 bg-gray-100 rounded-md p-1">
+          <ToolButton
+            isActive={drawingMode === "circle"}
+            onClick={() => setDrawingMode("circle")}
+          >
+            <Circle className="w-4 h-4" />
+          </ToolButton>
+          <ToolButton
+            isActive={drawingMode === "square"}
+            onClick={() => setDrawingMode("square")}
+          >
+            <Square className="w-4 h-4" />
+          </ToolButton>
+          <ToolButton
+            isActive={drawingMode === "triangle"}
+            onClick={() => setDrawingMode("triangle")}
+          >
+            <Triangle className="w-4 h-4" />
+          </ToolButton>
+          <ToolButton
+            isActive={drawingMode === "arrow"}
+            onClick={() => setDrawingMode("arrow")}
+          >
+            <MoveRight className="w-4 h-4" />
+          </ToolButton>
+        </div>
+
+        <Separator orientation="vertical" className="h-8" />
+
+        <div className="flex items-center space-x-1 bg-gray-100 rounded-md p-1">
+          <ToolButton onClick={copySelection} disabled={!selection}>
+            <Copy className="w-4 h-4" />
+          </ToolButton>
+          <ToolButton onClick={cutSelection} disabled={!selection}>
+            <Scissors className="w-4 h-4" />
+          </ToolButton>
+          <ToolButton
+            onClick={pasteSelection}
+            disabled={!clipboard || !selection}
+          >
+            <Clipboard className="w-4 h-4" />
+          </ToolButton>
+        </div>
+
+        <Separator orientation="vertical" className="h-8" />
+
+        <motion.div whileHover={{ scale: 1.05 }}>
+          <Select
+            value={brushSize.toString()}
+            onValueChange={(value) => setBrushSize(Number(value))}
+          >
+            <SelectTrigger className="w-[90px] h-8">
+              <SelectValue>
+                <div className="flex items-center space-x-2">
+                  <div
+                    className="bg-black"
+                    style={{
+                      width: `${brushSize}px`,
+                      height: `${brushSize}px`,
+                      borderRadius: `${brushSize / 2}px`,
+                    }}
+                  />
+                  <span>{brushSize}px</span>
+                </div>
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {BRUSH_SIZES.map((size) => (
+                <SelectItem key={size} value={size.toString()}>
+                  <div className="flex items-center space-x-2">
+                    <div
+                      className="bg-black min-w-[30px]"
+                      style={{
+                        width: `${size}px`,
+                        height: `${size}px`,
+                        borderRadius: `${size / 2}px`,
+                      }}
+                    />
+                    <span>{size}px</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </motion.div>
+
+        <Separator orientation="vertical" className="h-8" />
+
+        <div className="flex items-center space-x-1">
+          <div className="flex space-x-1">
+            {COLOR_PALETTE.map((paletteColor) => (
+              <motion.button
+                key={paletteColor}
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.95 }}
+                className={`w-6 h-6 rounded-md ${
+                  primaryColor === paletteColor
+                    ? "ring-2 ring-offset-2 ring-blue-500"
+                    : ""
+                }`}
+                style={{ backgroundColor: paletteColor }}
+                onClick={() => setPrimaryColor(paletteColor)}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  setSecondaryColor(paletteColor);
+                }}
+              />
+            ))}
           </div>
-
-          <Separator orientation="vertical" className="h-12" />
-
-          <div className="flex flex-col">
-            <input
+          {/*
+          <div className="flex flex-col space-y-1">
+            <motion.input
+              whileHover={{ scale: 1.1 }}
               type="color"
               value={primaryColor}
               onChange={(e) => setPrimaryColor(e.target.value)}
               className="w-6 h-6"
             />
-            <input
+            <motion.input
+              whileHover={{ scale: 1.1 }}
               type="color"
               value={secondaryColor}
               onChange={(e) => setSecondaryColor(e.target.value)}
               className="w-6 h-6"
             />
           </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex space-x-1 gap-1">
-              {COLOR_PALETTE.slice(0, Math.ceil(COLOR_PALETTE.length / 2)).map(
-                (paletteColor) => (
-                  <button
-                    key={paletteColor}
-                    className={`w-5 h-5 rounded-full ${
-                      primaryColor === paletteColor
-                        ? "ring-1 ring-offset-1 ring-blue-500"
-                        : ""
-                    }`}
-                    style={{ backgroundColor: paletteColor }}
-                    onClick={() => setPrimaryColor(paletteColor)}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      setSecondaryColor(paletteColor);
-                    }}
-                  />
-                ),
-              )}
-            </div>
-            <div className="flex space-x-1 gap-1">
-              {COLOR_PALETTE.slice(Math.ceil(COLOR_PALETTE.length / 2)).map(
-                (paletteColor) => (
-                  <button
-                    key={paletteColor}
-                    className={`w-5 h-5 rounded-full ${
-                      primaryColor === paletteColor
-                        ? "ring-1 ring-offset-1 ring-blue-500"
-                        : ""
-                    }`}
-                    style={{ backgroundColor: paletteColor }}
-                    onClick={() => setPrimaryColor(paletteColor)}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      setSecondaryColor(paletteColor);
-                    }}
-                  />
-                ),
-              )}
-            </div>
-          </div>
-          <Separator orientation="vertical" className="h-12" />
-
-          <Button
-            variant={drawingMode === "circle" ? "secondary" : "outline"}
-            onClick={() => setDrawingMode("circle")}
-            className="p-2"
-          >
-            <Circle className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={drawingMode === "square" ? "secondary" : "outline"}
-            onClick={() => setDrawingMode("square")}
-            className="p-2"
-          >
-            <Square className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={drawingMode === "triangle" ? "secondary" : "outline"}
-            onClick={() => setDrawingMode("triangle")}
-            className="p-2"
-          >
-            <Triangle className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={drawingMode === "arrow" ? "secondary" : "outline"}
-            onClick={() => setDrawingMode("arrow")}
-            className="p-2"
-          >
-            <MoveRight className="w-4 h-4" />
-          </Button>
-
-          <Separator orientation="vertical" className="h-12" />
-
-          <Button onClick={copySelection} disabled={!selection}>
-            <Copy className="w-4 h-4" />
-          </Button>
-          <Button onClick={cutSelection} disabled={!selection}>
-            <Scissors className="w-4 h-4" />
-          </Button>
-          <Button onClick={pasteSelection} disabled={!clipboard || !selection}>
-            <Clipboard className="w-4 h-4" />
-          </Button>
+          */}
         </div>
-      </div>
+      </motion.div>
       <div className="relative flex-grow">
         <div className="absolute bottom-2 left z-10 p-2">
           <MenuComponent
