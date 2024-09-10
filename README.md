@@ -1,4 +1,4 @@
-# Drawing App
+# Paint
 
 ## Overview
 
@@ -100,6 +100,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Contact
 
-Luca Palminteri - [@luca-palminteri](https://www.linkedin.com/in/luca-palminteri) - [lucapalminteri02@gmail.com](mailto:lucapalminteri02@gmail.com)
+[Luca Palminteri](https://www.linkedin.com/in/luca-palminteri) - [lucapalminteri02@gmail.com](mailto:lucapalminteri02@gmail.com)
 
 Project Link: [https://github.com/lucapalminteri/paint](https://github.com/lucapalminteri/paint)
