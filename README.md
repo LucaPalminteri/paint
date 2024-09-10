@@ -4,7 +4,7 @@
 
 This project is a web-based drawing and diagramming tool inspired by Excalidraw. It provides a simple, intuitive interface for creating diagrams, sketches, and other visual content directly in the browser.
 
-![Paint Image](/paint.png "Paint Image")
+![Paint Image](/public/paint.png "Paint Image")
 
 ## Features
 
@@ -35,39 +35,39 @@ This project is a web-based drawing and diagramming tool inspired by Excalidraw.
 
 1.  Clone the repository:
 
-    Copy
-
-    `git clone https://github.com/lucapalminteri/paint.git`
+    ```
+    git clone https://github.com/lucapalminteri/paint.git
+    ```
 
 2.  Navigate to the project directory:
 
-    Copy
-
-    `cd paint`
+    ```
+    cd paint
+    ```
 
 3.  Install dependencies:
 
-    Copy
 
-    `npm install`
+    ```
+    npm install
+    ```
 
     or
 
-    Copy
-
-    `yarn install`
+    ```
+    yarn install
+    ```
 
 4.  Start the development server:
 
-    Copy
-
-    `npm run dev`
-
+    ```
+    npm run dev
+    ```
     or
 
-    Copy
-
-    `yarn dev`
+    ```
+    yarn dev
+    ```
 
 5.  Open `http://localhost:3000` in your browser to see the application.
 
